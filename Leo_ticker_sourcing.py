@@ -19,7 +19,8 @@ def get_sp500_tickers():
         resp = requests.get('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
         resp.raise_for_status()  # Raise an exception for bad status codes
         soup = bs.BeautifulSoup(resp.text, 'lxml')
-        table = soup.find('table', {'class': 'wikitable sortable'})
+        # Find the correct table by its unique ID, which is more robust than using class names
+        table = soup.find('table', {'id': 'constituents'})
 
         tickers = []
         for row in table.findAll('tr')[1:]:
