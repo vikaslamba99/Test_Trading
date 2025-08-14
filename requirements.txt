@@ -1,0 +1,10 @@
+# This file contains the Python dependencies for the Leo Trading Platform.
+# Install them using: pip install -r requirements.txt
+
+mysql-connector-python
+SQLAlchemy
+yfinance
+pandas
+beautifulsoup4
+requests
+pandas-ta
