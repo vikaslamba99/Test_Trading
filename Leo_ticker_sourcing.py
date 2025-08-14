@@ -23,25 +23,23 @@ def get_sp500_tickers():
 
         tickers = []
         for row in table.findAll('tr')[1:]:
-            # The ticker symbol is in the first 'td'
-            ticker = row.findAll('td')[0].text.strip().replace('.', '-')
+            cells = row.findAll('td')
+            # Ensure the row has enough columns before processing to avoid index errors
+            if len(cells) >= 4:
+                ticker = cells[0].text.strip().replace('.', '-')
+                name = cells[1].text.strip()
+                # In the current Wikipedia layout, GICS Sector is the 3rd column
+                # and Sub-Industry is the 4th.
+                sector = cells[2].text.strip()
+                industry = cells[3].text.strip()
 
-            # The company name is in the second 'td'
-            name = row.findAll('td')[1].text.strip()
-
-            # The GICS sector is in the third 'td'
-            sector = row.findAll('td')[2].text.strip()
-
-            # The GICS sub-industry is in the fourth 'td'
-            industry = row.findAll('td')[3].text.strip()
-
-            stock_info = {
-                'ticker': ticker,
-                'name': name,
-                'sector': sector,
-                'industry': industry
-            }
-            tickers.append(stock_info)
+                stock_info = {
+                    'ticker': ticker,
+                    'name': name,
+                    'sector': sector,
+                    'industry': industry
+                }
+                tickers.append(stock_info)
 
         print(f"Successfully fetched {len(tickers)} tickers.")
         return tickers
