@@ -49,7 +49,9 @@ def fetch_historical_data(ticker, start_date, end_date):
     """
     print(f"Fetching historical data for {ticker} from {start_date} to {end_date}...")
     try:
-        data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+        # Set auto_adjust=False to ensure the 'Adj Close' column is returned,
+        # which is expected by the rest of the script.
+        data = yf.download(ticker, start=start_date, end=end_date, progress=False, auto_adjust=False)
         if data.empty:
             print(f"No data found for ticker {ticker}. It might be delisted or the ticker is incorrect.")
             return None

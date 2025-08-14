@@ -76,12 +76,16 @@ def run_data_ingestion_pipeline():
         return
 
     for i, (stock_id, ticker_symbol) in enumerate(tickers_to_process):
-        print(f"\nProcessing {ticker_symbol} ({i+1}/{len(tickers_to_process)})...")
-        historical_data = Leo_data_ingestion.fetch_historical_data(ticker_symbol, START_DATE, END_DATE)
+        try:
+            print(f"\nProcessing {ticker_symbol} ({i+1}/{len(tickers_to_process)})...")
+            historical_data = Leo_data_ingestion.fetch_historical_data(ticker_symbol, START_DATE, END_DATE)
 
-        if historical_data is not None and not historical_data.empty:
-            prepared_df = Leo_data_ingestion.prepare_data_for_db(historical_data, stock_id)
-            Leo_data_ingestion.store_prices_to_db(prepared_df)
+            if historical_data is not None and not historical_data.empty:
+                prepared_df = Leo_data_ingestion.prepare_data_for_db(historical_data, stock_id)
+                Leo_data_ingestion.store_prices_to_db(prepared_df)
+        except Exception as e:
+            print(f"A critical error occurred while processing ticker {ticker_symbol}. Skipping. Error: {e}")
+            continue
 
 def run_indicator_calculation_pipeline():
     """
