@@ -24,22 +24,27 @@ def get_sp500_tickers():
         tickers = []
         for row in table.findAll('tr')[1:]:
             cells = row.findAll('td')
-            # Ensure the row has enough columns before processing to avoid index errors
+            # Ensure the row has enough columns to parse the main info
             if len(cells) >= 4:
                 ticker = cells[0].text.strip().replace('.', '-')
                 name = cells[1].text.strip()
-                # In the current Wikipedia layout, GICS Sector is the 3rd column
-                # and Sub-Industry is the 4th.
                 sector = cells[2].text.strip()
                 industry = cells[3].text.strip()
 
-                stock_info = {
-                    'ticker': ticker,
-                    'name': name,
-                    'sector': sector,
-                    'industry': industry
-                }
-                tickers.append(stock_info)
+                # A final check to ensure the ticker is not empty, which might indicate a header row
+                if ticker:
+                    stock_info = {
+                        'ticker': ticker,
+                        'name': name,
+                        'sector': sector,
+                        'industry': industry
+                    }
+                    tickers.append(stock_info)
+                else:
+                    print(f"Skipping row with empty ticker: {row.text.strip()}")
+            else:
+                # Add logging for skipped rows to help with debugging
+                print(f"Skipping row with insufficient columns ({len(cells)}): {row.text.strip()}")
 
         print(f"Successfully fetched {len(tickers)} tickers.")
         return tickers

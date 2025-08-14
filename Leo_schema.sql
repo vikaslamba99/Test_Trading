@@ -9,7 +9,7 @@ USE algotrader;
 -- Table to store information about the stocks
 CREATE TABLE IF NOT EXISTS stocks (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    ticker VARCHAR(10) NOT NULL UNIQUE,
+    ticker VARCHAR(20) NOT NULL UNIQUE,
     name VARCHAR(255),
     sector VARCHAR(255),
     industry VARCHAR(255),
