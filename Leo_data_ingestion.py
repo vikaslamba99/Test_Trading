@@ -5,6 +5,7 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime
+from sqlalchemy import text
 import Leo_connection
 
 def get_tickers_from_db():
@@ -133,7 +134,7 @@ def store_prices_to_db(df):
                 SELECT stock_id, price_date, open_price, high_price, low_price, close_price, adj_close_price, volume
                 FROM {temp_table_name};
                 """
-                result = conn.execute(insert_sql)
+                result = conn.execute(text(insert_sql))
                 print(f"Successfully inserted {result.rowcount} new price records.")
 
                 # Drop the temporary table

@@ -5,6 +5,7 @@
 import pandas as pd
 import pandas_ta as ta
 import Leo_connection
+from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 def get_stocks_to_process():
@@ -131,7 +132,7 @@ def store_indicators_to_db(df):
         # Delete existing records to prevent duplicates and ensure fresh data
         if stock_price_ids:
             delete_query = f"DELETE FROM technical_indicators WHERE stock_price_id IN ({','.join(map(str, stock_price_ids))})"
-            session.execute(delete_query)
+            session.execute(text(delete_query))
 
         # Insert new records
         df.to_sql('technical_indicators', engine, if_exists='append', index=False)
