@@ -122,28 +122,19 @@ def store_indicators_to_db(df):
 
     stock_price_ids = df['stock_price_id'].tolist()
 
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
     try:
-        # Start a transaction
-        session.begin()
-
-        # Delete existing records to prevent duplicates and ensure fresh data
-        if stock_price_ids:
-            delete_query = f"DELETE FROM technical_indicators WHERE stock_price_id IN ({','.join(map(str, stock_price_ids))})"
-            session.execute(text(delete_query))
-
-        # Insert new records
-        df.to_sql('technical_indicators', engine, if_exists='append', index=False)
-
-        session.commit()
+        # Using a chunksize helps with performance and avoids database timeouts
+        # for large inserts. The user can truncate the table manually for a fresh start.
+        df.to_sql(
+            'technical_indicators',
+            con=engine,
+            if_exists='append',
+            index=False,
+            chunksize=500  # Insert 500 rows at a time
+        )
         print(f"Stored {len(df)} indicator records.")
     except Exception as e:
         print(f"An error occurred during indicator storage: {e}")
-        session.rollback()
-    finally:
-        session.close()
 
 
 if __name__ == '__main__':
