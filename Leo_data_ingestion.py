@@ -72,6 +72,12 @@ def prepare_data_for_db(df, stock_id):
         pandas.DataFrame: The formatted DataFrame.
     """
     df = df.copy()
+
+    # yfinance returns a multi-level column index for single-ticker downloads.
+    # This checks for that and flattens the columns to a single level.
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.droplevel(1)
+
     df.reset_index(inplace=True)
     df['stock_id'] = stock_id
 
