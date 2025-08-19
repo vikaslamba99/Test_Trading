@@ -9,3 +9,9 @@ beautifulsoup4
 lxml
 requests
 pandas-ta-openbb
+dash
+dash-bootstrap-components
+pandas_market_calendars
+feedparser
+celery
+redis
