@@ -153,4 +153,4 @@ def update_database_callback(n_clicks):
 if __name__ == '__main__':
     # Note: For production, use a proper WSGI server like Gunicorn or Waitress
     # Example: gunicorn Leo_dashboard:server -b 0.0.0.0:8090
-    app.run_server(debug=True, host='0.0.0.0', port=8090)
+    app.run(debug=True, host='0.0.0.0', port=8090)
