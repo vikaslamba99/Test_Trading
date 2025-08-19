@@ -137,8 +137,8 @@ def store_prices_to_db(df):
                 result = conn.execute(text(insert_sql))
                 print(f"Successfully inserted {result.rowcount} new price records.")
 
-                # Drop the temporary table
-                conn.execute(f"DROP TABLE {temp_table_name}")
+                # Drop the temporary table, ensuring it's also a text object
+                conn.execute(text(f"DROP TABLE {temp_table_name}"))
 
     except Exception as e:
         print(f"An error occurred during database insertion: {e}")
