@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import datetime
 from sqlalchemy import text
 import Leo_connection
+from Leo_indicator_calculation import run_full_indicator_calculation
 
 def get_tickers_from_db():
     """
@@ -144,7 +145,60 @@ def store_prices_to_db(df):
         print(f"An error occurred during database insertion: {e}")
 
 
+def update_stock_data_to_latest():
+    """
+    Updates the stock_prices table with the latest data since the last entry.
+    """
+    print("--- Starting data update process ---")
+    engine = Leo_connection.get_db_engine()
+    if not engine:
+        print("Database connection failed. Aborting update.")
+        return
+
+    try:
+        with engine.connect() as conn:
+            # Find the most recent date in the database
+            last_date_query = "SELECT MAX(price_date) FROM stock_prices"
+            result = conn.execute(text(last_date_query)).scalar_one_or_none()
+
+        if result is None:
+            print("No existing data found. Please run the full data ingestion first.")
+            return
+
+        start_date = result + pd.Timedelta(days=1)
+        end_date = pd.to_datetime('today').date()
+
+        if start_date > end_date:
+            print("Database is already up to date.")
+            return
+
+        print(f"Database is updated until {result}. Fetching new data from {start_date} to {end_date}...")
+
+        tickers_to_process = get_tickers_from_db()
+
+        for stock_id, ticker_symbol in tickers_to_process:
+            # Using .strftime('%Y-%m-%d') to ensure correct format for the API call
+            historical_data = fetch_historical_data(ticker_symbol, start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
+
+            if historical_data is not None and not historical_data.empty:
+                prepared_df = prepare_data_for_db(historical_data, stock_id)
+                store_prices_to_db(prepared_df)
+
+        print("--- Data update process complete ---")
+
+        # After updating prices, trigger a full recalculation of indicators
+        # to ensure all data is consistent.
+        print("\nTriggering indicator recalculation after price update...")
+        run_full_indicator_calculation()
+
+    except Exception as e:
+        print(f"An error occurred during the data update process: {e}")
+
+
 if __name__ == '__main__':
+    # This block can be used for a full initial data load.
+    # The new update function will be called by the dashboard button.
+    print("Running initial data load as main script...")
     START_DATE = "2018-07-01"
     # Set end date far in the future to get all available data up to today
     END_DATE = "2025-07-31"
@@ -158,4 +212,4 @@ if __name__ == '__main__':
             prepared_df = prepare_data_for_db(historical_data, stock_id)
             store_prices_to_db(prepared_df)
 
-    print("\nData ingestion process complete.")
+    print("\nInitial data load process complete.")

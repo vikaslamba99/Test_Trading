@@ -137,11 +137,15 @@ def store_indicators_to_db(df):
         print(f"An error occurred during indicator storage: {e}")
 
 
-if __name__ == '__main__':
+def run_full_indicator_calculation():
+    """
+    Runs the indicator calculation process for all stocks in the database.
+    """
+    print("\n--- Running Full Technical Indicator Calculation ---")
     stock_id_list = get_stocks_to_process()
 
     for i, stock_id in enumerate(stock_id_list):
-        print(f"\nProcessing stock {i+1}/{len(stock_id_list)} (ID: {stock_id})...")
+        print(f"\nCalculating for stock ID: {stock_id} ({i+1}/{len(stock_id_list)})...")
         prices = get_price_data_for_stock(stock_id)
 
         if not prices.empty:
@@ -153,4 +157,7 @@ if __name__ == '__main__':
         else:
             print(f"No price data found for stock ID {stock_id}.")
 
-    print("\nTechnical indicator calculation process complete.")
+    print("\n--- Technical indicator calculation process complete ---")
+
+if __name__ == '__main__':
+    run_full_indicator_calculation()
